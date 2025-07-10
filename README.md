@@ -23,10 +23,15 @@ The app simulates and analyzes transit flow by:
 
 ## 📦 How to Run the Demo
 
-1. Clone this repository on your machine
+1. Clone this repository on your machine using `git clone https://github.com/ArnavKothekar/TT-Seek_Project.git`
 2. Install all of the required python modules using `pip install -r requirements.txt`
-3. Open `run.py` in your preferred Python IDE or compiler
-4. Run the script
+3. Create a `.env` file in the root directory.
+4. Write your Gemini API key in the `.env` file as follows:
+```
+API_KEY=your_api_key_here
+```
+6. Open `run.py` in your preferred Python IDE or compiler
+7. Run the script
 
 Once running, visit:
 
