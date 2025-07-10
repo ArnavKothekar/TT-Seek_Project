@@ -23,9 +23,10 @@ The app simulates and analyzes transit flow by:
 
 ## 📦 How to Run the Demo
 
-1. Download the ZIP file from this repository.
-2. Open `run.py` in your preferred Python IDE or compiler.
-3. Run the script.
+1. Clone this repository on your machine
+2. Install all of the required python modules using `pip install -r requirements.txt`
+3. Open `run.py` in your preferred Python IDE or compiler
+4. Run the script
 
 Once running, visit:
 
