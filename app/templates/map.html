@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>TT-Seek Bus Analysis Model</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: sans-serif;
+      background-color: #f4f4f4;
+    }
+
+    header {
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo-title {
+      display: flex;
+      align-items: center;
+      /* Added inline styles will handle spacing */
+    }
+
+    /* Removed .logo-title img CSS so sizing done inline */
+
+    #content-wrapper {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    #ai-commentary {
+      flex: 0 0 300px;
+      background-color: white;
+      padding: 20px 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      font-size: 16px;
+      line-height: 1.6;
+      color: #333;
+      height: 600px;
+      overflow-y: auto;
+    }
+
+    #ai-commentary h2 {
+      margin-top: 0;
+      font-size: 20px;
+      color: #0077cc;
+    }
+
+    #map-container {
+      flex: 1;
+      max-width: 900px;
+      height: 600px;
+      border: 2px solid #ccc;
+      border-radius: 12px;
+      overflow: hidden;
+      background-color: white;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
+      position: relative;
+    }
+
+    #map {
+      height: 100%;
+      width: 100%;
+    }
+
+    #stop-count {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+      font-size: 13px;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-title" style="display: flex; align-items: center; padding: 10px 0; gap: 20px;">
+      <img 
+        src="{{ url_for('static', filename='TTSeek_logo.png') }}" 
+        alt="Logo" 
+        width="150" 
+        height="80" 
+        style="object-fit: contain; display: block;"
+      >
+      <div>
+        <h1 style="margin: 0;">TT-Seek Bus Route Analysis Model</h1>
+        <p style="margin: 0;">This tool shows filtered bus stops on Eglinton Avenue. Hover markers to see live data.</p>
+      </div>
+    </div>
+  </header>
+
+  <div id="content-wrapper">
+    <!-- Left: AI commentary -->
+    <div id="ai-commentary">
+      <h2>AI Transit Recommendation</h2>
+      <p>{{ ai_commentary.replace('\n', '<br>') | default('No recommendations available at this time.') | safe }}</p>
+    </div>
+
+    <!-- Right: Map -->
+    <div id="map-container">
+      <div id="stop-count">Stops: 0</div>
+      <div id="map"></div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <script>
+    const map = L.map('map').setView([43.7, -79.25], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    const stops = {{ stops|tojson|safe }};
+    document.getElementById('stop-count').textContent = `Stops: ${stops.length}`;
+
+    function getColor(people) {
+      if (people >= 16) return "#ff0000";
+      if (people >= 12) return "#ff6600";
+      if (people >= 8)  return "#ffaa00";
+      if (people >= 4)  return "#99cc00";
+      return "#0099cc";
+    }
+
+    stops.forEach(stop => {
+      const color = getColor(stop.people_waiting);
+
+      L.circleMarker([stop.lat, stop.lon], {
+        radius: 10,
+        fillColor: color,
+        color: "#000",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.7
+      })
+      .addTo(map)
+      .bindPopup(
+        `<strong>${stop.name}</strong><br>
+         Direction: ${stop.direction}<br>
+         People waiting: ${stop.people_waiting}`
+      );
+    });
+  </script>
+</body>
+</html>
